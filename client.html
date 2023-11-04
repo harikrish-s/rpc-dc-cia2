@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RPC Implementation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        h1 {
+            color: #3e3e3e;
+        }
+
+        input, select, button {
+            margin: 5px;
+            padding: 5px;
+        }
+
+        button {
+            background-color: #000000;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        p {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>DC CIA 2 - RPC Implementation</h1>
+    <h2>Server - Python Flask</h2>
+    <h2>Client - HTML/CSS/JavaScript</h2>
+    <hr>
+    <p>Enter Two Numbers</p>
+
+    <input type="number" id="number1" placeholder="Number 1">
+    <input type="number" id="number2" placeholder="Number 2">
+    <select id="operation">
+        <option value="add">Add</option>
+        <option value="subtract">Subtract</option>
+        <option value="multiply">Multiply</option>
+        <option value="divide">Divide</option>
+    </select>
+    <button onclick="performOperation()">Calculate</button>
+
+    <h2 id="result"></h2>
+
+    <script>
+        function callRPC(method, params, callback) {
+            fetch('http://localhost:8000/rpc', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ method, params }),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Cannot reach server');
+                }
+                return response.json();
+            })
+            .then(data => callback(data.result))
+            .catch(error => console.error('Error:', error));
+        }
+
+        function performOperation() {
+            const number1 = parseFloat(document.getElementById('number1').value);
+            const number2 = parseFloat(document.getElementById('number2').value);
+            const operation = document.getElementById('operation').value;
+
+            if (!isNaN(number1) && !isNaN(number2)) {
+                callRPC(operation, [number1, number2], result => {
+                    document.getElementById('result').textContent = `Result: ${result}`;
+                });
+            } else {
+                alert('Please Enter Valid Numbers');
+            }
+        }
+    </script>
+</body>
+</html>
